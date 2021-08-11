@@ -1,0 +1,5 @@
+- [ ] Support else clause
+- [ ] Support switch
+- [ ] Support args by struct
+- [ ] Optimize
+- [ ] Support evaluating the multi-token [if] predicate?
