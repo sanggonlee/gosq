@@ -18,4 +18,11 @@
 //    IncludeReviews: true,
 //  })
 //
+
+// Limitations:
+//  - The predicate (expression between [if] and [then]) must be a one word: either true, false or
+//    a parameter that evaluates to a boolean. There's no support to evaluate an arbitrary predicate
+//    expression yet.
+//  - gosq does not validate nor executes the query itself. The only thing it does is
+//    build the query in string out of a template.
 package gosq // import "github.com/sanggonlee/gosq"

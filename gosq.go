@@ -24,6 +24,12 @@ import (
 //  - {{ [if] predicate [then] clause }}
 //  - {{ [if] predicate [then] clause [else] clause }}
 //
+// Recursive expressions are supported, as long as they're parts of a [then] or
+// [else] clause. For example:
+//  {{ [if] predicate [then]
+//    {{ [if] predicate [then] clause }}
+//  }}
+//
 // If you need grammar for a more complex expression and you think it's a common
 // use case, please file an issue in GitHub.
 func Apply(template string, args interface{}) (string, error) {
