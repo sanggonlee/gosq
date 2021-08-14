@@ -27,7 +27,7 @@ func TestSyntaxTree_SubstituteVars(t *testing.T) {
 					&literal{"ABC"},
 					&ifBlock{
 						predicateExpr: []string{"GHI"},
-						expr: &SyntaxTree{
+						then: &SyntaxTree{
 							children: []LanguageNode{
 								&literal{"JKL"},
 							},
@@ -39,7 +39,7 @@ func TestSyntaxTree_SubstituteVars(t *testing.T) {
 							&literal{"GHI"},
 							&ifBlock{
 								predicateExpr: []string{"false"},
-								expr: &SyntaxTree{
+								then: &SyntaxTree{
 									children: []LanguageNode{
 										&literal{"JKL"},
 									},
@@ -65,7 +65,7 @@ func TestSyntaxTree_SubstituteVars(t *testing.T) {
 					&literal{"Hello"},
 					&ifBlock{
 						predicateExpr: []string{"true"},
-						expr: &SyntaxTree{
+						then: &SyntaxTree{
 							children: []LanguageNode{
 								&literal{"JKL"},
 							},
@@ -77,7 +77,7 @@ func TestSyntaxTree_SubstituteVars(t *testing.T) {
 							&literal{"true"},
 							&ifBlock{
 								predicateExpr: []string{"false"},
-								expr: &SyntaxTree{
+								then: &SyntaxTree{
 									children: []LanguageNode{
 										&literal{"JKL"},
 									},
@@ -101,7 +101,7 @@ func TestSyntaxTree_SubstituteVars(t *testing.T) {
 					&literal{"ABC"},
 					&ifBlock{
 						predicateExpr: []string{"GHI", "JKL"},
-						expr: &SyntaxTree{
+						then: &SyntaxTree{
 							children: []LanguageNode{
 								&literal{"JKL"},
 							},
@@ -122,7 +122,7 @@ func TestSyntaxTree_SubstituteVars(t *testing.T) {
 					&literal{"ABC"},
 					&ifBlock{
 						predicateExpr: []string{},
-						expr: &SyntaxTree{
+						then: &SyntaxTree{
 							children: []LanguageNode{
 								&literal{"JKL"},
 							},
@@ -143,7 +143,7 @@ func TestSyntaxTree_SubstituteVars(t *testing.T) {
 					&literal{"ABC"},
 					&ifBlock{
 						predicateExpr: []string{"GHI"},
-						expr: &SyntaxTree{
+						then: &SyntaxTree{
 							children: []LanguageNode{
 								&literal{"JKL"},
 							},
@@ -190,7 +190,7 @@ func TestSyntaxTree_Evaluate(t *testing.T) {
 					&literal{"ABC"},
 					&ifBlock{
 						predicateExpr: []string{"true"},
-						expr: &SyntaxTree{
+						then: &SyntaxTree{
 							children: []LanguageNode{
 								&literal{"JKL"},
 							},
@@ -199,7 +199,7 @@ func TestSyntaxTree_Evaluate(t *testing.T) {
 					&literal{"GHI"},
 					&ifBlock{
 						predicateExpr: []string{"false"},
-						expr: &SyntaxTree{
+						then: &SyntaxTree{
 							children: []LanguageNode{
 								&literal{"DEF"},
 							},
@@ -209,6 +209,43 @@ func TestSyntaxTree_Evaluate(t *testing.T) {
 				},
 			},
 			expected: "ABC JKL GHI MNO",
+		},
+		{
+			desc: "Evaluate a nested syntax tree with if-else block",
+			inputSyntaxTree: &SyntaxTree{
+				children: []LanguageNode{
+					&literal{"ABC"},
+					&ifBlock{
+						predicateExpr: []string{"false"},
+						then: &SyntaxTree{
+							children: []LanguageNode{
+								&literal{"JKL"},
+							},
+						},
+						otherwise: &SyntaxTree{
+							children: []LanguageNode{
+								&literal{"MNO"},
+							},
+						},
+					},
+					&literal{"GHI"},
+					&ifBlock{
+						predicateExpr: []string{"false"},
+						then: &SyntaxTree{
+							children: []LanguageNode{
+								&literal{"DEF"},
+							},
+						},
+						otherwise: &SyntaxTree{
+							children: []LanguageNode{
+								&literal{"PQR"},
+							},
+						},
+					},
+					&literal{"MNO"},
+				},
+			},
+			expected: "ABC MNO GHI PQR MNO",
 		},
 	}
 

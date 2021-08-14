@@ -137,6 +137,50 @@ func TestApply(t *testing.T) {
 				LIMIT 10
 			`,
 		},
+		{
+			desc: "Simple truthy if-then-else clause",
+			inputTemplate: `
+				SELECT
+					products.*
+				FROM products
+				WHERE category = $1
+				OFFSET 100
+				LIMIT {{ [if] .GetMany [then] 100 [else] 10 }}
+			`,
+			inputArgs: map[string]interface{}{
+				"GetMany": true,
+			},
+			expected: `
+				SELECT
+					products.*
+				FROM products
+				WHERE category = $1
+				OFFSET 100
+				LIMIT 100
+			`,
+		},
+		{
+			desc: "Simple falsey if-then-else clause",
+			inputTemplate: `
+				SELECT
+					products.*
+				FROM products
+				WHERE category = $1
+				OFFSET 100
+				LIMIT {{ [if] .GetMany [then] 100 [else] 10 }}
+			`,
+			inputArgs: map[string]interface{}{
+				"GetMany": false,
+			},
+			expected: `
+				SELECT
+					products.*
+				FROM products
+				WHERE category = $1
+				OFFSET 100
+				LIMIT 10
+			`,
+		},
 	}
 	for _, c := range cases {
 		t.Run(c.desc, func(t *testing.T) {

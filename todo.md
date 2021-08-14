@@ -1,4 +1,4 @@
-- [ ] Support else clause
+- [x] Support else clause
 - [ ] Support switch
 - [ ] Support args by struct
 - [ ] Optimize

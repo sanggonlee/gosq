@@ -136,12 +136,98 @@ func TestBuildTokenTree_Parse(t *testing.T) {
 								children: []LanguageNode{
 									&ifBlock{
 										predicateExpr: []string{"STU"},
-										expr: &SyntaxTree{
+										then: &SyntaxTree{
 											children: []LanguageNode{
 												&literal{"VWX"},
 												&SyntaxTree{
 													children: []LanguageNode{
 														&literal{"YZ"},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			desc: "Token tree with if-else block",
+			inputTokenTree: &TokenTree{
+				chunks: []chunk{
+					&literal{"ABC"},
+					&TokenTree{
+						chunks: []chunk{
+							&literal{"DEF"},
+							&literal{"GHI"},
+						},
+					},
+					&literal{"JKL"},
+					&TokenTree{
+						chunks: []chunk{
+							&literal{"MNO"},
+							&literal{"PQR"},
+							&TokenTree{
+								chunks: []chunk{
+									&literal{"[if]"},
+									&literal{"STU"},
+									&literal{"[then]"},
+									&literal{"VWX"},
+									&TokenTree{
+										chunks: []chunk{
+											&literal{"YZ"},
+										},
+									},
+									&literal{"[else]"},
+									&literal{"ABC"},
+									&TokenTree{
+										chunks: []chunk{
+											&literal{"DEF"},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expected: &SyntaxTree{
+				children: []LanguageNode{
+					&literal{"ABC"},
+					&SyntaxTree{
+						children: []LanguageNode{
+							&literal{"DEF"},
+							&literal{"GHI"},
+						},
+					},
+					&literal{"JKL"},
+					&SyntaxTree{
+						children: []LanguageNode{
+							&literal{"MNO"},
+							&literal{"PQR"},
+							&SyntaxTree{
+								children: []LanguageNode{
+									&ifBlock{
+										predicateExpr: []string{"STU"},
+										then: &SyntaxTree{
+											children: []LanguageNode{
+												&literal{"VWX"},
+												&SyntaxTree{
+													children: []LanguageNode{
+														&literal{"YZ"},
+													},
+												},
+											},
+										},
+										otherwise: &SyntaxTree{
+											children: []LanguageNode{
+												&literal{"ABC"},
+												&SyntaxTree{
+													children: []LanguageNode{
+														&literal{"DEF"},
 													},
 												},
 											},

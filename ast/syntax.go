@@ -64,7 +64,8 @@ func (l *literal) Evaluate() string {
 // ifBlock represents a parsed syntax state of an [if] block.
 type ifBlock struct {
 	predicateExpr []string
-	expr          *SyntaxTree
+	then          *SyntaxTree
+	otherwise     *SyntaxTree
 }
 
 // SubstituteVars performs var substitution on the predicate and expression of
@@ -86,8 +87,14 @@ func (ib *ifBlock) SubstituteVars(vars map[string]interface{}) error {
 		return errors.New("predicate must be a boolean expression")
 	}
 
-	if err := ib.expr.SubstituteVars(vars); err != nil {
+	if err := ib.then.SubstituteVars(vars); err != nil {
 		return err
+	}
+
+	if ib.otherwise != nil {
+		if err := ib.otherwise.SubstituteVars(vars); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -100,8 +107,11 @@ func (ib *ifBlock) Evaluate() string {
 		return ""
 	}
 	if strings.ToLower(ib.predicateExpr[0]) == "true" {
-		return ib.expr.Evaluate()
+		return ib.then.Evaluate()
+	} else if ib.otherwise != nil {
+		return ib.otherwise.Evaluate()
 	}
+
 	return ""
 }
 
@@ -144,6 +154,7 @@ func parseIfBlock(tt *TokenTree) (*ifBlock, error) {
 	var (
 		isIf   bool = true
 		isThen bool
+		isElse bool
 	)
 	for i, chunk := range tt.chunks {
 		if i == 0 {
@@ -158,7 +169,11 @@ func parseIfBlock(tt *TokenTree) (*ifBlock, error) {
 				return nil, errors.Wrap(err, "parsing an expression for if block")
 			}
 
-			ib.expr.children = append(ib.expr.children, node)
+			if isThen {
+				ib.then.children = append(ib.then.children, node)
+			} else if isElse {
+				ib.otherwise.children = append(ib.otherwise.children, node)
+			}
 		}
 
 		literalChunk, isLiteral := chunk.(*literal)
@@ -166,11 +181,18 @@ func parseIfBlock(tt *TokenTree) (*ifBlock, error) {
 			if literalChunk.String() == keywordThen {
 				isIf = false
 				isThen = true
-				ib.expr = &SyntaxTree{}
+				ib.then = &SyntaxTree{}
+			} else if literalChunk.String() == keywordElse {
+				isIf = false
+				isThen = false
+				isElse = true
+				ib.otherwise = &SyntaxTree{}
 			} else if isIf {
 				ib.predicateExpr = append(ib.predicateExpr, literalChunk.String())
 			} else if isThen {
-				ib.expr.children = append(ib.expr.children, literalChunk)
+				ib.then.children = append(ib.then.children, literalChunk)
+			} else if isElse {
+				ib.otherwise.children = append(ib.otherwise.children, literalChunk)
 			}
 		}
 	}
