@@ -32,5 +32,35 @@ func main() {
 		panic(err)
 	}
 
+	q = `
+		SELECT
+			products.*
+			{{ [if] .IncludeReviews [then] ,json_agg(reviews) AS reviews }}
+		FROM products
+		{{ [if] .IncludeReviews [then] LEFT JOIN reviews ON reviews.product_id =
+			{{ [if] .IncludeFoo [then] products.id }}
+		}}
+		WHERE category = $1
+		OFFSET {{ .Offset }}
+		{{ .LimitClause }}
+	`
+	// s := strings.ReplaceAll(q, "\n", " ")
+	// s = strings.ReplaceAll(s, "\t", " ")
+	// s = strings.ReplaceAll(s, "  ", " ")
+	result, err = gosq.Apply(q, struct {
+		IncludeReviews bool
+		IncludeFoo     bool
+		Offset         int
+		LimitClause    string
+	}{
+		IncludeReviews: true,
+		IncludeFoo:     true,
+		Offset:         100,
+		LimitClause:    "LIMIT 10",
+	})
+	if err != nil {
+		panic(err)
+	}
+
 	fmt.Println(result)
 }

@@ -181,6 +181,69 @@ func TestApply(t *testing.T) {
 				LIMIT 10
 			`,
 		},
+		{
+			desc: "Simple case of truthy substitute from struct",
+			inputTemplate: `
+				SELECT
+					products.*
+					{{ [if] .IncludeReviews [then] ,json_agg(reviews) AS reviews }}
+				FROM products
+				{{ [if] .IncludeReviews [then] LEFT JOIN reviews ON reviews.product_id = products.id }}
+				WHERE category = $1
+				OFFSET 100
+				LIMIT 10
+			`,
+			inputArgs: struct {
+				IncludeReviews bool
+			}{
+				IncludeReviews: true,
+			},
+			expected: `
+				SELECT
+					products.*
+					,json_agg(reviews) AS reviews
+				FROM products
+				LEFT JOIN reviews ON reviews.product_id = products.id
+				WHERE category = $1
+				OFFSET 100
+				LIMIT 10
+			`,
+		},
+		{
+			desc: "Recursive falsey expression from struct",
+			inputTemplate: `
+				SELECT
+					products.*
+					{{
+						[if] .IncludeReviews [then] ,json_agg(reviews) AS reviews
+						{{
+							[if] .IncludeCount [then] ,count(reviews) AS num_reviews
+						}}
+					}}
+				FROM products
+				{{ [if] .IncludeReviews [then] LEFT JOIN reviews ON reviews.product_id = products.id }}
+				WHERE category = $1
+				OFFSET 100
+				LIMIT 10
+			`,
+			inputArgs: struct {
+				IncludeReviews bool
+				IncludeCount   bool
+			}{
+				IncludeReviews: true,
+				IncludeCount:   false,
+			},
+			expected: `
+				SELECT
+					products.*
+					,json_agg(reviews) AS reviews
+				FROM products
+				LEFT JOIN reviews ON reviews.product_id = products.id
+				WHERE category = $1
+				OFFSET 100
+				LIMIT 10
+			`,
+		},
 	}
 	for _, c := range cases {
 		t.Run(c.desc, func(t *testing.T) {
