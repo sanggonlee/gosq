@@ -13,7 +13,7 @@ It provides syntax to inject arbitrary conditional query piece.
 ## Usage
 
 ```go
-q, err := gosq.Apply(`
+q, err := gosq.Compile(`
   SELECT
     products.*
     {{ [if] .IncludeReviews [then] ,json_agg(reviews) AS reviews }}
@@ -32,7 +32,7 @@ q, err := gosq.Apply(`
 or
 
 ```go
-q, err := gosq.Apply(`
+q, err := gosq.Compile(`
   SELECT
     products.*
     {{ [if] .IncludeReviews [then] ,json_agg(reviews) AS reviews }}
@@ -148,7 +148,7 @@ func getProducts(includeReviews bool) {
   type queryArgs struct {
     IncludeReviews bool
   }
-  q, err := gosq.Apply(`
+  q, err := gosq.Compile(`
     SELECT
       products.*
       {{ [if] .IncludeReviews [then] ,json_agg(reviews) AS reviews }}

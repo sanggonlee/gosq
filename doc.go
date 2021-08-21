@@ -5,7 +5,7 @@
 //
 // It provides a very simple syntax to inject arbitrary conditional query piece.
 //
-//  q, err := gosq.Apply(`
+//  q, err := gosq.Compile(`
 //    SELECT
 //      products.*
 //      {{ [if] .IncludeReviews [then] ,json_agg(reviews) AS reviews }}

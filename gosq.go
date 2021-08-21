@@ -8,7 +8,7 @@ import (
 	"github.com/sanggonlee/gosq/ast"
 )
 
-// Apply receives a query template and a map of parameters, and replaces
+// Compile receives a query template and a map of parameters, and replaces
 // the expressions in the query template based on the values of the parameters.
 //
 // "args" can either be a map of parameters (map[string]interface{}), or a
@@ -31,8 +31,8 @@ import (
 //  }}
 //
 // If you need grammar for a more complex expression and you think it's a common
-// use case, please file an issue in GitHub.
-func Apply(template string, args interface{}) (string, error) {
+// use case, please file an issue on GitHub.
+func Compile(template string, args interface{}) (string, error) {
 	if args == nil {
 		return template, nil
 	}

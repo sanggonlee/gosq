@@ -8,7 +8,7 @@ import (
 	"github.com/sanggonlee/gosq"
 )
 
-func TestApply(t *testing.T) {
+func TestCompile(t *testing.T) {
 	cases := []struct {
 		desc          string
 		inputTemplate string
@@ -247,7 +247,7 @@ func TestApply(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.desc, func(t *testing.T) {
-			result, err := gosq.Apply(c.inputTemplate, c.inputArgs)
+			result, err := gosq.Compile(c.inputTemplate, c.inputArgs)
 			if whitespaceNormalized(result) != whitespaceNormalized(c.expected) {
 				t.Errorf("Expected %s, got %s", c.expected, result)
 			}
