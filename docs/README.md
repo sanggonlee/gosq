@@ -46,6 +46,23 @@ q, err := gosq.Compile(`
 })
 ```
 
+Or if you prefer the syntax from [text/template](https://pkg.go.dev/text/template) package:
+
+```go
+q, err := gosq.Execute(`
+  SELECT
+    products.*
+    {{if .IncludeReviews}} ,json_agg(reviews) AS reviews {{end}}
+  FROM products
+  {{if .IncludeReviews}} LEFT JOIN reviews ON reviews.product_id = products.id {{end}}
+  WHERE category = $1
+  OFFSET 100
+  LIMIT 10
+`, map[string]interface{}{
+  "IncludeReviews": true,
+})
+```
+
 ## Installation
 
 ```
@@ -166,3 +183,10 @@ func getProducts(includeReviews bool) {
 And here we are, `gosq` is born.
 
 Note, this still doesn't address the problem with the preceeding comma. I can't think of a good way to address it in this solution - any suggestion for improvement is welcome.
+
+## Benchmarks
+
+```
+BenchmarkExecute-8         57698             19530 ns/op
+BenchmarkCompile-8        260319              4570 ns/op
+```
