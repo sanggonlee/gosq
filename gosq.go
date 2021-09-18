@@ -1,8 +1,10 @@
 package gosq
 
 import (
+	"bytes"
 	"fmt"
 	"reflect"
+	"text/template"
 
 	"github.com/pkg/errors"
 	"github.com/sanggonlee/gosq/ast"
@@ -84,4 +86,25 @@ func convertStructToMap(args interface{}) map[string]interface{} {
 		m[f.Name] = v.Field(i).Interface()
 	}
 	return m
+}
+
+// Execute is similar to Compile, but instead uses the syntax from the
+// text/template package.
+// Indeed it simply uses text/template package internally, and supports all
+// syntax provided by it, so use at your own risk/advantage.
+// The if-else-then expression equivalent to the Compile function would be:
+//
+// {{if predicate}} clause {{else}} clause {{end}}
+func Execute(str string, args interface{}) (string, error) {
+	tmpl, err := template.New("gosq").Parse(str)
+	if err != nil {
+		return "", errors.Wrap(err, "parsing template")
+	}
+
+	var buf bytes.Buffer
+	if err = tmpl.Execute(&buf, args); err != nil {
+		return "", errors.Wrap(err, "executing template")
+	}
+
+	return buf.String(), nil
 }
