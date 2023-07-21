@@ -109,6 +109,9 @@ func Execute(str string, args interface{}) (string, error) {
 	return buf.String(), nil
 }
 
+// ExecuteWithOption is same as Execute, but allows option string to be fed to the
+// Option method of Template. If an empty string is passed, by default
+// "missingkey=error" is used.
 func ExecuteWithOption(str string, args interface{}, option string) (string, error) {
 	// Default option, error out if key is missing
 	if option == "" {
