@@ -108,3 +108,21 @@ func Execute(str string, args interface{}) (string, error) {
 
 	return buf.String(), nil
 }
+
+func ExecuteWithOption(str string, args interface{}, option string) (string, error) {
+	// Default option, error out if key is missing
+	if option == "" {
+		option = "missingkey=error"
+	}
+	tmpl, err := template.New("gosq").Option(option).Parse(str)
+	if err != nil {
+		return "", errors.Wrap(err, "parsing template")
+	}
+
+	var buf bytes.Buffer
+	if err = tmpl.Execute(&buf, args); err != nil {
+		return "", errors.Wrap(err, "executing template")
+	}
+
+	return buf.String(), nil
+}
